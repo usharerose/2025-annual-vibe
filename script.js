@@ -6,13 +6,17 @@ class Heatmap {
 
         this.options = {
             width: options.width || 800,
-            height: options.height || 500,
-            rows: options.rows || 20,
-            cols: options.cols || 30,
+            height: options.height || 300,
+            rows: 7, // 7 days of week
+            cols: options.cols || 52, // 52 weeks in a year
             padding: options.padding || 2,
             colorMap: options.colorMap || this.getDefaultColorMap(),
+            labelPadding: 60, // Space for labels
             ...options
         };
+
+        this.weekdays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+        this.weekdayLabels = ['', '周二', '', '周四', '', '周六', '']; // Only show specific days
 
         this.data = [];
         this.cellWidth = 0;
@@ -25,8 +29,8 @@ class Heatmap {
     }
 
     init() {
-        this.canvas.width = this.options.width;
-        this.canvas.height = this.options.height;
+        this.canvas.width = this.options.width + this.options.labelPadding;
+        this.canvas.height = this.options.height + this.options.labelPadding;
 
         this.cellWidth = (this.options.width - this.options.padding * (this.options.cols + 1)) / this.options.cols;
         this.cellHeight = (this.options.height - this.options.padding * (this.options.rows + 1)) / this.options.rows;
@@ -57,18 +61,46 @@ class Heatmap {
     render() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+        // Draw weekday labels (Y-axis) - only show specific days
+        this.ctx.fillStyle = '#666';
+        this.ctx.font = '12px Arial';
+        this.ctx.textAlign = 'right';
+        this.ctx.textBaseline = 'middle';
+
+        for (let i = 0; i < this.options.rows; i++) {
+            if (this.weekdayLabels[i]) { // Only draw non-empty labels
+                const y = i * (this.cellHeight + this.options.padding) + this.options.padding + this.cellHeight / 2 + this.options.labelPadding;
+                this.ctx.fillText(this.weekdayLabels[i], this.options.labelPadding - 10, y);
+            }
+        }
+
+        // Draw month labels (X-axis) - show month at first week of each month
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'top';
+        const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+        const monthStarts = [1, 5, 9, 14, 18, 22, 27, 31, 36, 40, 44, 49]; // Approximate week numbers for month starts
+
+        for (let i = 0; i < monthStarts.length; i++) {
+            const weekIndex = monthStarts[i] - 1;
+            if (weekIndex < this.options.cols) {
+                const x = weekIndex * (this.cellWidth + this.options.padding) + this.options.padding + this.cellWidth / 2 + this.options.labelPadding;
+                this.ctx.fillText(months[i], x, 10);
+            }
+        }
+
+        // Draw heatmap cells
         for (let i = 0; i < this.options.rows; i++) {
             for (let j = 0; j < this.options.cols; j++) {
                 const value = this.data[i][j];
                 const color = this.valueToColor(value);
 
-                const x = j * (this.cellWidth + this.options.padding) + this.options.padding;
-                const y = i * (this.cellHeight + this.options.padding) + this.options.padding;
+                const x = j * (this.cellWidth + this.options.padding) + this.options.padding + this.options.labelPadding;
+                const y = i * (this.cellHeight + this.options.padding) + this.options.padding + this.options.labelPadding;
 
                 this.ctx.fillStyle = color;
                 this.ctx.fillRect(x, y, this.cellWidth, this.cellHeight);
 
-                this.ctx.strokeStyle = '#fff';
+                this.ctx.strokeStyle = '#e0e0e0';
                 this.ctx.lineWidth = 1;
                 this.ctx.strokeRect(x, y, this.cellWidth, this.cellHeight);
             }
@@ -77,14 +109,16 @@ class Heatmap {
 
     getCellFromCoordinates(x, y) {
         const rect = this.canvas.getBoundingClientRect();
-        const canvasX = x - rect.left;
-        const canvasY = y - rect.top;
+        const canvasX = x - rect.left - this.options.labelPadding;
+        const canvasY = y - rect.top - this.options.labelPadding;
 
         const col = Math.floor(canvasX / (this.cellWidth + this.options.padding));
         const row = Math.floor(canvasY / (this.cellHeight + this.options.padding));
 
         if (row >= 0 && row < this.options.rows && col >= 0 && col < this.options.cols) {
-            return { row, col, value: this.data[row][col] };
+            const weekday = this.weekdays[row];
+            const week = col + 1;
+            return { row, col, value: this.data[row][col], weekday, week };
         }
         return null;
     }
@@ -104,7 +138,7 @@ class Heatmap {
         this.canvas.addEventListener('mousemove', (e) => {
             const cell = this.getCellFromCoordinates(e.clientX, e.clientY);
             if (cell) {
-                const content = `Row: ${cell.row}<br>Col: ${cell.col}<br>Value: ${cell.value.toFixed(3)}`;
+                const content = `第${cell.week}周<br>${this.weekdays[cell.row]}<br>数值: ${cell.value.toFixed(3)}`;
                 this.showTooltip(e.clientX, e.clientY, content);
             } else {
                 this.hideTooltip();
@@ -130,9 +164,8 @@ class Heatmap {
 document.addEventListener('DOMContentLoaded', function() {
     const heatmap = new Heatmap('heatmap-canvas', {
         width: 800,
-        height: 500,
-        rows: 20,
-        cols: 30
+        height: 300,
+        cols: 52
     });
 
     const generateButton = document.getElementById('generate-data');
