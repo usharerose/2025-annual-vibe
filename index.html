@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heatmap Visualization</title>
+    <title>运势热力图</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Data Heatmap</h1>
+            <h1>运势热力图</h1>
         </header>
 
         <main>
@@ -49,14 +50,22 @@
             </div>
 
             <div id="heatmap-container" class="heatmap-wrapper">
+                <div class="heatmap-header">
+                    <div class="year-selector">
+                        <label for="heatmap-year">年份</label>
+                        <select id="heatmap-year">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
                 <canvas id="heatmap-canvas"></canvas>
                 <div id="tooltip" class="tooltip"></div>
                 <div class="heatmap-controls">
-                    <button id="generate-data">Generate New Data</button>
+                    <button id="generate-data">重新计算运势</button>
                     <div class="legend">
-                        <span class="legend-label">Low</span>
+                        <span class="legend-label">运势低</span>
                         <div class="legend-gradient"></div>
-                        <span class="legend-label">High</span>
+                        <span class="legend-label">运势高</span>
                     </div>
                 </div>
             </div>
