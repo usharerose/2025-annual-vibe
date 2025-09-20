@@ -13,21 +13,56 @@
         </header>
 
         <main>
+            <div class="birth-date-section">
+                <h3>出生日期设置</h3>
+                <div class="birth-date-controls">
+                    <div class="date-input-group">
+                        <label for="birth-year">年</label>
+                        <select id="birth-year">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="date-input-group">
+                        <label for="birth-month">月</label>
+                        <select id="birth-month">
+                            <option value="1">1月</option>
+                            <option value="2">2月</option>
+                            <option value="3">3月</option>
+                            <option value="4">4月</option>
+                            <option value="5">5月</option>
+                            <option value="6" selected>6月</option>
+                            <option value="7">7月</option>
+                            <option value="8">8月</option>
+                            <option value="9">9月</option>
+                            <option value="10">10月</option>
+                            <option value="11">11月</option>
+                            <option value="12">12月</option>
+                        </select>
+                    </div>
+                    <div class="date-input-group">
+                        <label for="birth-day">日</label>
+                        <select id="birth-day">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <div id="heatmap-container" class="heatmap-wrapper">
                 <canvas id="heatmap-canvas"></canvas>
                 <div id="tooltip" class="tooltip"></div>
+                <div class="heatmap-controls">
+                    <button id="generate-data">Generate New Data</button>
+                    <div class="legend">
+                        <span class="legend-label">Low</span>
+                        <div class="legend-gradient"></div>
+                        <span class="legend-label">High</span>
+                    </div>
+                </div>
             </div>
         </main>
 
         <footer>
-            <div class="controls">
-                <button id="generate-data">Generate New Data</button>
-                <div class="legend">
-                    <span class="legend-label">Low</span>
-                    <div class="legend-gradient"></div>
-                    <span class="legend-label">High</span>
-                </div>
-            </div>
         </footer>
     </div>
 

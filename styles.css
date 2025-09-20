@@ -33,7 +33,8 @@ header h1 {
 main {
     flex: 1;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
     align-items: center;
 }
 
@@ -44,6 +45,15 @@ main {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 20px;
     overflow: hidden;
+}
+
+.heatmap-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
 }
 
 #heatmap-canvas {
@@ -72,17 +82,66 @@ main {
 
 footer {
     margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-.controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.birth-date-section {
     background: white;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.birth-date-section h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-size: 1.2em;
+    font-weight: 400;
+}
+
+.birth-date-controls {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.date-input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.date-input-group label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.date-input-group select {
+    padding: 8px 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    font-size: 14px;
+    color: #2c3e50;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    min-width: 80px;
+}
+
+.date-input-group select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.date-input-group select:hover {
+    border-color: #3498db;
+}
+
 
 #generate-data {
     background: #3498db;
@@ -120,9 +179,14 @@ footer {
 }
 
 @media (max-width: 768px) {
-    .controls {
+    .heatmap-controls {
         flex-direction: column;
-        gap: 20px;
+        gap: 15px;
+    }
+
+    .birth-date-controls {
+        flex-direction: column;
+        gap: 15px;
     }
 
     .legend-gradient {

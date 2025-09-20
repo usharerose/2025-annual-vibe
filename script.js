@@ -168,6 +168,87 @@ document.addEventListener('DOMContentLoaded', function() {
         cols: 52
     });
 
+    // Birth date controls
+    const birthYear = document.getElementById('birth-year');
+    const birthMonth = document.getElementById('birth-month');
+    const birthDay = document.getElementById('birth-day');
+
+    // Populate year options (1900-2100)
+    function populateYearOptions() {
+        for (let year = 1900; year <= 2100; year++) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year + '年';
+            if (year === 1990) option.selected = true; // Default selection
+            birthYear.appendChild(option);
+        }
+    }
+
+    // Populate day options based on selected year and month
+    function populateDayOptions() {
+        const year = parseInt(birthYear.value);
+        const month = parseInt(birthMonth.value);
+        const daysInMonth = new Date(year, month, 0).getDate();
+        const currentDay = parseInt(birthDay.value) || 15;
+
+        // Clear existing options
+        birthDay.innerHTML = '';
+
+        // Add new options
+        for (let day = 1; day <= daysInMonth; day++) {
+            const option = document.createElement('option');
+            option.value = day;
+            option.textContent = day + '日';
+            if (day === Math.min(currentDay, daysInMonth)) {
+                option.selected = true;
+            }
+            birthDay.appendChild(option);
+        }
+    }
+
+    // Load birth date from localStorage
+    function loadBirthDate() {
+        const savedBirthDate = localStorage.getItem('birthDate');
+        if (savedBirthDate) {
+            const { year, month, day } = JSON.parse(savedBirthDate);
+            birthYear.value = year;
+            birthMonth.value = month;
+            populateDayOptions();
+            birthDay.value = day;
+        }
+    }
+
+    // Save birth date to localStorage
+    function saveBirthDate() {
+        const birthDate = {
+            year: parseInt(birthYear.value),
+            month: parseInt(birthMonth.value),
+            day: parseInt(birthDay.value)
+        };
+        localStorage.setItem('birthDate', JSON.stringify(birthDate));
+    }
+
+
+    // Event listeners for birth date controls
+    birthYear.addEventListener('change', () => {
+        populateDayOptions();
+        saveBirthDate();
+    });
+
+    birthMonth.addEventListener('change', () => {
+        populateDayOptions();
+        saveBirthDate();
+    });
+
+    birthDay.addEventListener('change', () => {
+        saveBirthDate();
+    });
+
+    // Initialize birth date
+    populateYearOptions();
+    populateDayOptions();
+    loadBirthDate();
+
     const generateButton = document.getElementById('generate-data');
     generateButton.addEventListener('click', () => {
         heatmap.regenerateData();
