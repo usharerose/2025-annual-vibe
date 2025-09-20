@@ -114,9 +114,7 @@ footer {
     width: 200px;
     height: 20px;
     background: linear-gradient(to right,
-        #313695, #4575b4, #74add1, #abd9e9,
-        #e0f3f8, #ffffcc, #fee090, #fdae61,
-        #f46d43, #d73027, #a50026);
+        #F2B652, #E8E284, #ACE08C, #54D99F, #26C4A5);
     border-radius: 10px;
     border: 1px solid #ddd;
 }
