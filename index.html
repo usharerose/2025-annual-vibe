@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heatmap Visualization</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Data Heatmap</h1>
+        </header>
+
+        <main>
+            <div id="heatmap-container" class="heatmap-wrapper">
+                <canvas id="heatmap-canvas"></canvas>
+                <div id="tooltip" class="tooltip"></div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="controls">
+                <button id="generate-data">Generate New Data</button>
+                <div class="legend">
+                    <span class="legend-label">Low</span>
+                    <div class="legend-gradient"></div>
+                    <span class="legend-label">High</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
