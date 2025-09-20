@@ -104,7 +104,7 @@ main {
 }
 
 .tooltip {
-    position: absolute;
+    position: fixed;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 0;
@@ -113,12 +113,12 @@ main {
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s ease;
-    z-index: 10;
+    z-index: 9999;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px);
-    min-width: 320px;
-    max-width: 350px;
+    min-width: 380px;
+    max-width: 400px;
 }
 
 .tooltip.show {
@@ -126,7 +126,7 @@ main {
 }
 
 .tooltip-content {
-    padding: 16px;
+    padding: 14px;
 }
 
 .tooltip-header h4 {
@@ -140,17 +140,33 @@ main {
 
 .charts-container {
     display: flex;
-    gap: 20px;
+    gap: 15px;
     align-items: center;
+    justify-content: space-between;
 }
 
 .gauge-section {
-    flex: 0 0 150px;
+    flex: 0 0 140px;
     text-align: center;
 }
 
 .bars-section {
     flex: 1;
+    min-width: 200px;
+}
+
+.qr-section {
+    margin-top: 15px;
+    text-align: center;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.qr-text {
+    margin-top: 8px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
 }
 
 footer {

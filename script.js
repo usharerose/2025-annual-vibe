@@ -127,9 +127,9 @@ class FortuneCalculator {
 
         return {
             total: Math.round(totalScore),
-            career: Math.round(Math.min(100, Math.max(0, elementScore + (Math.random() - 0.5) * 15))),
-            family: Math.round(Math.min(100, Math.max(0, tianGanDiZhiScore + (Math.random() - 0.5) * 15))),
-            friendship: Math.round(Math.min(100, Math.max(0, numerologyScore + (Math.random() - 0.5) * 15)))
+            newFeature: Math.round(Math.min(100, Math.max(0, elementScore + (Math.random() - 0.5) * 15))),
+            legacyCode: Math.round(Math.min(100, Math.max(0, tianGanDiZhiScore + (Math.random() - 0.5) * 15))),
+            production: Math.round(Math.min(100, Math.max(0, numerologyScore + (Math.random() - 0.5) * 15)))
         };
     }
 
@@ -336,15 +336,42 @@ class Heatmap {
 
         this.tooltip.innerHTML = content;
 
-        const tooltipWidth = 320;
+        const tooltipWidth = 380;  // Updated to match CSS
         const tooltipHeight = 220;
 
-        let tooltipX = x + 15;
+        // Position tooltip closer to mouse, with smart positioning
+        let tooltipX = x + 10;  // Closer to mouse
         let tooltipY = y - tooltipHeight / 2;
 
-        if (tooltipX + tooltipWidth > window.innerWidth) {
-            tooltipX = x - tooltipWidth - 15;
+        // Get heatmap bounds for better positioning
+        const rect = this.canvas.getBoundingClientRect();
+        const heatmapLeft = rect.left;
+        const heatmapRight = rect.right;
+        const heatmapTop = rect.top;
+        const heatmapBottom = rect.bottom;
+
+        // Adjust horizontal position
+        if (tooltipX + tooltipWidth > heatmapRight) {
+            tooltipX = x - tooltipWidth - 10;  // Show on left side of cursor
         }
+
+        // Further adjust if still outside window
+        if (tooltipX + tooltipWidth > window.innerWidth) {
+            tooltipX = window.innerWidth - tooltipWidth - 10;
+        }
+        if (tooltipX < 0) {
+            tooltipX = 10;
+        }
+
+        // Adjust vertical position
+        if (tooltipY < heatmapTop) {
+            tooltipY = heatmapTop + 10;  // Keep within heatmap bounds
+        }
+        if (tooltipY + tooltipHeight > heatmapBottom) {
+            tooltipY = heatmapBottom - tooltipHeight - 10;
+        }
+
+        // Further adjust if still outside window
         if (tooltipY < 0) {
             tooltipY = 10;
         }
@@ -387,11 +414,8 @@ class Heatmap {
 
                 const content = this.createTooltipContent(dateStr, cell.scores);
 
-                const rect = this.canvas.getBoundingClientRect();
-                const cellCenterX = rect.left + this.options.labelPadding + cell.col * (this.cellWidth + this.options.padding) + this.options.padding + this.cellWidth / 2;
-                const cellCenterY = rect.top + this.options.labelPadding + cell.row * (this.cellHeight + this.options.padding) + this.options.padding + this.cellHeight / 2;
-
-                this.showTooltip(cellCenterX, cellCenterY, content, cell.scores);
+                // Use mouse position directly for more responsive positioning
+                this.showTooltip(e.clientX, e.clientY, content, cell.scores);
             } else {
                 this.hideTooltip();
             }
@@ -412,6 +436,13 @@ class Heatmap {
     createTooltipContent(dateStr, scores) {
         const tooltipId = 'tooltip-' + Date.now();
 
+        const qrSection = scores.total < 60 ? `
+            <div class="qr-section">
+                <canvas id="qr-${tooltipId}" width="80" height="80"></canvas>
+                <div class="qr-text">扫码功香, 积攒气运</div>
+            </div>
+        ` : '';
+
         return `
             <div class="tooltip-content">
                 <div class="tooltip-header">
@@ -419,12 +450,13 @@ class Heatmap {
                 </div>
                 <div class="charts-container">
                     <div class="gauge-section">
-                        <canvas id="gauge-${tooltipId}" width="150" height="75"></canvas>
+                        <canvas id="gauge-${tooltipId}" width="140" height="70"></canvas>
                     </div>
                     <div class="bars-section">
-                        <canvas id="bars-${tooltipId}" width="200" height="120"></canvas>
+                        <canvas id="bars-${tooltipId}" width="200" height="110"></canvas>
                     </div>
                 </div>
+                ${qrSection}
             </div>
         `;
     }
@@ -479,23 +511,23 @@ class Heatmap {
 
                         ctx.font = '10px Arial';
                         ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                        ctx.fillText('总运势', centerX, centerY + 10);
+                        ctx.fillText('工作运势', centerX, centerY + 10);
                         ctx.restore();
                     }
                 }]
             });
         }
 
-        // Create bar chart
+        // Create bar chart (horizontal)
         const barCanvas = this.tooltip.querySelector(`canvas[id*="bars"]`);
         if (barCanvas) {
             const ctx = barCanvas.getContext('2d');
             this.barChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['事业', '家庭', '友情'],
+                    labels: ['功能开发顺利', '屎山代码变香', '线上环境平安'],
                     datasets: [{
-                        data: [scores.career, scores.family, scores.friendship],
+                        data: [scores.newFeature, scores.legacyCode, scores.production],
                         backgroundColor: [
                             'rgba(52, 152, 219, 0.8)',
                             'rgba(231, 76, 60, 0.8)',
@@ -511,10 +543,11 @@ class Heatmap {
                     }]
                 },
                 options: {
+                    indexAxis: 'y', // This makes it horizontal
                     responsive: false,
                     maintainAspectRatio: false,
                     scales: {
-                        y: {
+                        x: {
                             beginAtZero: true,
                             max: 100,
                             ticks: {
@@ -525,10 +558,10 @@ class Heatmap {
                                 color: 'rgba(255, 255, 255, 0.1)'
                             }
                         },
-                        x: {
+                        y: {
                             ticks: {
                                 color: 'rgba(255, 255, 255, 0.9)',
-                                font: { size: 11 }
+                                font: { size: 10 }
                             },
                             grid: {
                                 display: false
@@ -541,6 +574,58 @@ class Heatmap {
                     }
                 }
             });
+        }
+
+        // Create QR code (fake payment code) - only when score < 60
+        const qrCanvas = this.tooltip.querySelector(`canvas[id*="qr"]`);
+        if (qrCanvas && scores.total < 60) {
+            // Generate random payment-like string
+            const randomPaymentCode = `wxpay://f2f0p0${Math.random().toString(36).substring(2, 22)}`;
+
+            // Wait a bit for the QRCode library to be available and retry if needed
+            const tryGenerateQR = (attempts = 0) => {
+                if (typeof QRCode !== 'undefined') {
+                    QRCode.toCanvas(qrCanvas, randomPaymentCode, {
+                        width: 80,
+                        height: 80,
+                        margin: 1,
+                        color: {
+                            dark: '#000000',
+                            light: '#FFFFFF'
+                        }
+                    }, (error) => {
+                        if (error) console.error('QR Code generation failed:', error);
+                    });
+                } else if (typeof window.QRCode !== 'undefined') {
+                    window.QRCode.toCanvas(qrCanvas, randomPaymentCode, {
+                        width: 80,
+                        height: 80,
+                        margin: 1,
+                        color: {
+                            dark: '#000000',
+                            light: '#FFFFFF'
+                        }
+                    }, (error) => {
+                        if (error) console.error('QR Code generation failed:', error);
+                    });
+                } else if (attempts < 3) {
+                    // Retry after a short delay
+                    setTimeout(() => tryGenerateQR(attempts + 1), 100);
+                } else {
+                    console.warn('QRCode library not loaded after retries');
+                    // Fallback: show text instead of QR code
+                    const ctx = qrCanvas.getContext('2d');
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, 80, 80);
+                    ctx.fillStyle = 'black';
+                    ctx.font = '10px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('QR', 40, 35);
+                    ctx.fillText('CODE', 40, 50);
+                }
+            };
+
+            tryGenerateQR();
         }
     }
 
